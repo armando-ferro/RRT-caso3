@@ -79,6 +79,7 @@ void FIFOQueue::handleMessage(cMessage *msg)
             if(!queue.isEmpty()) {
                 cMessage *nextMsg = check_and_cast<cMessage *>(queue.pop());
                 numQueuedPackets--;
+                state = sending;
                 forwardMessage(nextMsg);
             } else {
                 state = idle;
