@@ -33,15 +33,20 @@ void SimpleNode::handleMessage(cMessage *msg)
     if(tmsg->getArrivalGateId() != gate("gateSource")->getId()) {
         int gateLinkIndex = tmsg->getArrivalGate()->getIndex();
         EV << "Data packet arrived at gateLink$i[" << gateLinkIndex << "]\n";
-        sendACK(gateLinkIndex);
-
-        if(getIndex() != 2 && getIndex() != 3) {
-            bubble("ARRIVED. ACK SENT. FORWARDING!");
-            forwardMessage(tmsg);
-        } else {
-            bubble("ARRIVED. ACK SENT. DELETING!");
+        if(tmsg->hasBitError()) {
+            bubble("ARRIVED WITH ERROR. DISCARDING!");
             delete tmsg;
+        } else {
+            sendACK(gateLinkIndex);
+            if(getIndex() != 2 && getIndex() != 3) {
+                bubble("ARRIVED. ACK SENT. FORWARDING!");
+                forwardMessage(tmsg);
+            } else {
+                bubble("ARRIVED. ACK SENT. DELETING!");
+                delete tmsg;
+            }
         }
+
     } else {
         bubble("ARRIVED FROM SOURCE. FORWARDING!");
         forwardMessage(tmsg);
@@ -64,6 +69,8 @@ void SimpleNode::forwardMessage(Caso3Pkt *msg)
 
 void SimpleNode::sendACK(int gateLinkIndex)
 {
+    while(gate("gateLink$o", gateLinkIndex)->getTransmissionChannel()->isBusy());
+
     bubble("SENDING ACK!");
     Caso3Pkt *ackmsg = new Caso3Pkt("ACK");
     send(ackmsg, "gateLink$o", gateLinkIndex);

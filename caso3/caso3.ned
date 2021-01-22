@@ -22,6 +22,7 @@ simple Source
 simple FIFOQueue
 {
     parameters:
+        volatile double timeout @unit(s);
         @display("i=block/queue");
     gates:
         input gateNode;
@@ -34,6 +35,7 @@ network Caso3
         channel Channel extends ned.DatarateChannel {
             delay = 10ms; // tiempo de propagación
             datarate = 9600bps;
+            per = 0.8;
         }
     submodules:
         node[5]: SimpleNode;

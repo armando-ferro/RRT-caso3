@@ -20,6 +20,10 @@ class FIFOQueue : public cSimpleModule
         long int numQueuedPackets = -1;
     protected:
         cQueue queue;
+        cMessage *lastPacketSent;
+        cMessage *txFinishedMsg = new cMessage("Packet finished its transmission");
+        cMessage *timeoutMsg = new cMessage("Timeout!");
+        double timeout;
         virtual void forwardMessage(cMessage *msg);
         virtual void initialize() override;
         virtual void handleMessage(cMessage *msg) override;
@@ -32,6 +36,7 @@ void FIFOQueue::initialize()
 {
     state = idle;
     numQueuedPackets = 0;
+    timeout = par("timeout");
 }
 
 void FIFOQueue::handleMessage(cMessage *msg)
@@ -39,8 +44,23 @@ void FIFOQueue::handleMessage(cMessage *msg)
     int arrivalGateId = msg->getArrivalGateId();
 
     if(msg->isSelfMessage()) {
-        // Last data packet sent finished its transmission
-        state = waitingAck;
+        EV << "SELF MESSAGE\n";
+        if(msg == txFinishedMsg) {
+            EV << "SELF MESSAGE - TX FINISHED\n";
+            // Last data packet sent finished its transmission
+            state = waitingAck;
+            // Set timeout
+            simtime_t timeoutExpireTime = simTime() + timeout;
+            scheduleAt(timeoutExpireTime, timeoutMsg);
+        } else if(msg == timeoutMsg) {
+            EV << "SELF MESSAGE - TIMEOUT\n";
+            // Timeout expired waiting for ACK, resend last packet
+            bubble("Timeout expired!");
+            state = sending;
+            forwardMessage(lastPacketSent);
+        }
+
+
     } else if(arrivalGateId == gate("gateNode")->getId()) {
         // Data packet arrived
         if(gate("gateLink$o")->getTransmissionChannel()->isBusy() || state != idle) {
@@ -55,6 +75,7 @@ void FIFOQueue::handleMessage(cMessage *msg)
     } else if(arrivalGateId == gate("gateLink$i")->getId()) {
         // ACK arrived
         if(state == waitingAck) {
+            cancelEvent(timeoutMsg);
             if(!queue.isEmpty()) {
                 cMessage *nextMsg = check_and_cast<cMessage *>(queue.pop());
                 numQueuedPackets--;
@@ -69,11 +90,10 @@ void FIFOQueue::handleMessage(cMessage *msg)
 void FIFOQueue::forwardMessage(cMessage *msg)
 {
     send(msg, "gateLink$o");
+    lastPacketSent = msg->dup();
     EV << "Packet sent\n";
-
     simtime_t finishTime = gate("gateLink$o")->getTransmissionChannel()->getTransmissionFinishTime();
-    cMessage *selfmsg = new cMessage("Packet finished its transmission");
-    scheduleAt(finishTime, selfmsg);
+    scheduleAt(finishTime, txFinishedMsg);
     EV << "Packet will finish its transmission at " << finishTime << "\n";
 }
 
