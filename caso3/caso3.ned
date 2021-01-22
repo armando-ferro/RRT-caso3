@@ -2,6 +2,7 @@
 simple SimpleNode
 {
     parameters:
+        volatile double pOutputLink1;
         @display("i=block/routing");
     gates:
         input gateSource;
@@ -35,7 +36,7 @@ network Caso3
         channel Channel extends ned.DatarateChannel {
             delay = 10ms; // tiempo de propagación
             datarate = 9600bps;
-            per = 0.8;
+            per = 0.1;
         }
     submodules:
         node[5]: SimpleNode;

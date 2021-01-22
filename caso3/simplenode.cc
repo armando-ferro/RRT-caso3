@@ -57,9 +57,11 @@ void SimpleNode::forwardMessage(Caso3Pkt *msg)
 {
     int n = gateSize("gateQueue");
     int k = 0;
+    // p es la probabilidad de que el paquete se envíe por la gateQueue[1]
+    double p = par("pOutputLink1");
 
     if(n>1) {
-        k = intuniform(0, n-1);
+        k = bernoulli(p);
         EV << "Forwarding message " << msg << " on port gateQueue[" << k << "]\n";
         send(msg, "gateQueue", k);
     } else {
