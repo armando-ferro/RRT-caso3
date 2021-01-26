@@ -21,10 +21,13 @@ class SimpleNode : public cSimpleModule
   private:
     long numSent;
     long numReceived;
+    cLongHistogram delayStats;
+    cOutVector delayVector;
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void refreshDisplay() const override;
+    virtual void finish() override;
     virtual void forwardMessage(Caso3Pkt *msg);
     virtual void sendACK(int gateLinkIndex);
 };
@@ -58,6 +61,10 @@ void SimpleNode::handleMessage(cMessage *msg)
                 bubble("ARRIVED. ACK SENT. FORWARDING!");
                 forwardMessage(tmsg);
             } else {
+                simtime_t delay = simTime() - tmsg->getInitTime();
+                EV << "Delay: " << delay << "\n";
+                delayStats.collect(delay);
+                delayVector.record(delay);
                 bubble("ARRIVED. ACK SENT. DELETING!");
                 delete tmsg;
             }
@@ -102,3 +109,13 @@ void SimpleNode::refreshDisplay() const
     sprintf(buf, "rcvd: %ld sent: %ld", numReceived, numSent);
     getDisplayString().setTagArg("t", 0, buf);
 }
+
+void SimpleNode::finish()
+    {
+        EV << "Delay, min:    " << delayStats.getMin() << endl;
+        EV << "Delay, max:    " << delayStats.getMax() << endl;
+        EV << "Delay, mean:   " << delayStats.getMean() << endl;
+        EV << "Delay, stddev: " << delayStats.getStddev() << endl;
+
+        delayStats.recordAs("delay");
+    }

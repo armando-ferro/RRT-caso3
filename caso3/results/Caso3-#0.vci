@@ -1,0 +1,31 @@
+file 1797 1611680068                                            
+version 2
+run Caso3-0-20210126-17:51:02-5276
+attr configname Caso3
+attr datetime 20210126-17:51:02
+attr experiment Caso3
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsf ""
+attr measurement ""
+attr network Caso3
+attr processid 5276
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+param Caso3.source[*].packetGenInterval exponential(0.05s)
+param Caso3.source[*].packetLength exponential(1000)
+param Caso3.queue[*].timeout 0.1s
+param Caso3.node[0].pOutputLink1 3/4
+param Caso3.node[1].pOutputLink1 2/3
+param Caso3.node[2].pOutputLink1 0
+param Caso3.node[3].pOutputLink1 0
+param Caso3.node[4].pOutputLink1 1/2
+
+vector 0 Caso3.node[3] "" ETV
+vector 1 Caso3.node[2] "" ETV
+0	731 852 33 739 0.103541666667 2.593977053079 24 0.061875 1.875451285411 16.558825298249 16.898494630762
+1	1583 213 58 189 0.252589223666 0.626964223666 6 0.213229166667 0.272482079168 1.455901328544 0.3558639232123
+

@@ -107,7 +107,7 @@ void FIFOQueue::forwardMessage(cMessage *msg)
 
 void FIFOQueue::refreshDisplay() const
 {
-    char buf[40];
+    char buf[400];
     char stateString[20];
     switch(state) {
         case idle:
