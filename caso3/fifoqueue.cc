@@ -18,6 +18,7 @@ class FIFOQueue : public cSimpleModule
     private:
         short state = -1;
         long int numQueuedPackets = -1;
+        long int numSeqLink = -1;
     protected:
         cQueue queue;
         cMessage *lastPacketSent;
@@ -36,6 +37,7 @@ void FIFOQueue::initialize()
 {
     state = idle;
     numQueuedPackets = 0;
+    numSeqLink = 0;
     timeout = par("timeout");
 }
 
@@ -63,14 +65,19 @@ void FIFOQueue::handleMessage(cMessage *msg)
 
     } else if(arrivalGateId == gate("gateNode")->getId()) {
         // Data packet arrived
+
+        Caso3Pkt *pkt = check_and_cast<Caso3Pkt *>(msg);
+        pkt->setLinkSeqNum(numSeqLink);
+        numSeqLink++;
+
         if(gate("gateLink$o")->getTransmissionChannel()->isBusy() || state != idle) {
             // If channel is busy or state is not idle, add it to queue
-            queue.insert(msg);
+            queue.insert(pkt);
             numQueuedPackets++;
         } else {
             // If channel is not busy and state is idle, send it
             state = sending;
-            forwardMessage(msg);
+            forwardMessage(pkt);
         }
     } else if(arrivalGateId == gate("gateLink$i")->getId()) {
         // ACK arrived

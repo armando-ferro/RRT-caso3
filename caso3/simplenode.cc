@@ -18,17 +18,33 @@ using namespace omnetpp;
 
 class SimpleNode : public cSimpleModule
 {
+  private:
+    long numSent;
+    long numReceived;
   protected:
+    virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void refreshDisplay() const override;
     virtual void forwardMessage(Caso3Pkt *msg);
     virtual void sendACK(int gateLinkIndex);
 };
 
 Define_Module(SimpleNode);
 
+void SimpleNode::initialize()
+{
+    // Initialize variables
+    numSent = 0;
+    numReceived = 0;
+    WATCH(numSent);
+    WATCH(numReceived);
+}
+
 void SimpleNode::handleMessage(cMessage *msg)
 {
     Caso3Pkt *tmsg = check_and_cast<Caso3Pkt *>(msg);
+
+    numReceived++;
 
     if(tmsg->getArrivalGateId() != gate("gateSource")->getId()) {
         int gateLinkIndex = tmsg->getArrivalGate()->getIndex();
@@ -67,6 +83,8 @@ void SimpleNode::forwardMessage(Caso3Pkt *msg)
     } else {
         send(msg, "gateQueue");
     }
+
+    numSent++;
 }
 
 void SimpleNode::sendACK(int gateLinkIndex)
@@ -76,4 +94,11 @@ void SimpleNode::sendACK(int gateLinkIndex)
     bubble("SENDING ACK!");
     Caso3Pkt *ackmsg = new Caso3Pkt("ACK");
     send(ackmsg, "gateLink$o", gateLinkIndex);
+}
+
+void SimpleNode::refreshDisplay() const
+{
+    char buf[40];
+    sprintf(buf, "rcvd: %ld sent: %ld", numReceived, numSent);
+    getDisplayString().setTagArg("t", 0, buf);
 }
