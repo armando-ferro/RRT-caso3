@@ -86,3 +86,8 @@ Se ha utilizado un objeto Histograma de OMNeT++, que calcula la media de dicho r
   <img src="images/node4-stats.png" alt="Estadísticas del nodo 4">
 </p>
 
+## Problemas encontrados
+
+Un problema con el que me he encontrado en la simulación ha sido metiendo una tasa de paquetes erróneos en los enlaces. Al cabo de un tiempo, los enlaces acababan haciendo cosas raras, y en vez de distribuir los paquetes erróneos en el tiempo, se atascaban enviando únicamente y de forma iterativa paquetes erróneos, saturando la simulación.
+
+No se ha encontrado una solución al problema, por lo que al final se ha simulado sin errores para obtener una estimación del retardo. Sin embargo, se puede comprobar que el protocolo Stop & Wait actúa como debería, activando un timeout de espera a recibir un ACK, solo que no durante un largo periodo de tiempo.
