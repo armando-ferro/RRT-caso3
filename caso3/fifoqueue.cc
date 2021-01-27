@@ -46,16 +46,16 @@ void FIFOQueue::handleMessage(cMessage *msg)
     int arrivalGateId = msg->getArrivalGateId();
 
     if(msg->isSelfMessage()) {
-        EV << "SELF MESSAGE\n";
+        //EV << "SELF MESSAGE\n";
         if(msg == txFinishedMsg) {
-            EV << "SELF MESSAGE - TX FINISHED\n";
+            //EV << "SELF MESSAGE - TX FINISHED\n";
             // Last data packet sent finished its transmission
             state = waitingAck;
             // Set timeout
             simtime_t timeoutExpireTime = simTime() + timeout;
             scheduleAt(timeoutExpireTime, timeoutMsg);
         } else if(msg == timeoutMsg) {
-            EV << "SELF MESSAGE - TIMEOUT\n";
+            //EV << "SELF MESSAGE - TIMEOUT\n";
             // Timeout expired waiting for ACK, resend last packet
             bubble("Timeout expired!");
             state = sending;
@@ -81,6 +81,7 @@ void FIFOQueue::handleMessage(cMessage *msg)
         }
     } else if(arrivalGateId == gate("gateLink$i")->getId()) {
         // ACK arrived
+        delete msg;
         if(state == waitingAck) {
             cancelEvent(timeoutMsg);
             if(!queue.isEmpty()) {
@@ -99,10 +100,10 @@ void FIFOQueue::forwardMessage(cMessage *msg)
 {
     send(msg, "gateLink$o");
     lastPacketSent = msg->dup();
-    EV << "Packet sent\n";
+    //EV << "Packet sent\n";
     simtime_t finishTime = gate("gateLink$o")->getTransmissionChannel()->getTransmissionFinishTime();
     scheduleAt(finishTime, txFinishedMsg);
-    EV << "Packet will finish its transmission at " << finishTime << "\n";
+    //EV << "Packet will finish its transmission at " << finishTime << "\n";
 }
 
 void FIFOQueue::refreshDisplay() const

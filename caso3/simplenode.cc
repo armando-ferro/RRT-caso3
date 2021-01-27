@@ -21,6 +21,7 @@ class SimpleNode : public cSimpleModule
   private:
     long numSent;
     long numReceived;
+    long numDiscarded;
     cLongHistogram delayStats;
     cOutVector delayVector;
   protected:
@@ -39,6 +40,7 @@ void SimpleNode::initialize()
     // Initialize variables
     numSent = 0;
     numReceived = 0;
+    numDiscarded = 0;
     WATCH(numSent);
     WATCH(numReceived);
 }
@@ -51,9 +53,10 @@ void SimpleNode::handleMessage(cMessage *msg)
 
     if(tmsg->getArrivalGateId() != gate("gateSource")->getId()) {
         int gateLinkIndex = tmsg->getArrivalGate()->getIndex();
-        EV << "Data packet arrived at gateLink$i[" << gateLinkIndex << "]\n";
+        //EV << "Data packet arrived at gateLink$i[" << gateLinkIndex << "]\n";
         if(tmsg->hasBitError()) {
             bubble("ARRIVED WITH ERROR. DISCARDING!");
+            numDiscarded++;
             delete tmsg;
         } else {
             sendACK(gateLinkIndex);
@@ -62,7 +65,7 @@ void SimpleNode::handleMessage(cMessage *msg)
                 forwardMessage(tmsg);
             } else {
                 simtime_t delay = simTime() - tmsg->getInitTime();
-                EV << "Delay: " << delay << "\n";
+                EV << "Delay " << getIndex() << ": " << delay << "\n";
                 delayStats.collect(delay);
                 delayVector.record(delay);
                 bubble("ARRIVED. ACK SENT. DELETING!");
@@ -85,7 +88,7 @@ void SimpleNode::forwardMessage(Caso3Pkt *msg)
 
     if(n>1) {
         k = bernoulli(p);
-        EV << "Forwarding message " << msg << " on port gateQueue[" << k << "]\n";
+        //EV << "Forwarding message " << msg << " on port gateQueue[" << k << "]\n";
         send(msg, "gateQueue", k);
     } else {
         send(msg, "gateQueue");
@@ -105,8 +108,8 @@ void SimpleNode::sendACK(int gateLinkIndex)
 
 void SimpleNode::refreshDisplay() const
 {
-    char buf[40];
-    sprintf(buf, "rcvd: %ld sent: %ld", numReceived, numSent);
+    char buf[200];
+    sprintf(buf, "rcvd: %ld sent: %ld dcrd: %ld", numReceived, numSent, numDiscarded);
     getDisplayString().setTagArg("t", 0, buf);
 }
 

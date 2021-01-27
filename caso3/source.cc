@@ -10,17 +10,21 @@ using namespace std;
 
 class Source : public cSimpleModule
 {
+  private:
+    long numSent;
   protected:
     virtual Caso3Pkt *generatePacket(int flowSeqNum);
     virtual void forwardMessage(Caso3Pkt *msg);
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void refreshDisplay() const override;
 };
 
 Define_Module(Source);
 
 void Source::initialize()
 {
+    numSent = 0;
     Caso3Pkt *msg = generatePacket(0);
     scheduleAt(0.0, msg);
 }
@@ -59,7 +63,7 @@ void Source::handleMessage(cMessage *msg)
         simtime_t genInterval = par("packetGenInterval");
 
         scheduleAt(simTime()+genInterval, scheduledMsg);
-        EV << "Scheduled new message at " << simTime()+genInterval << "\n";
+        //EV << "Scheduled new message at " << simTime()+genInterval << "\n";
 
         srcmsg->setInitTime(simTime());
     }
@@ -68,7 +72,14 @@ void Source::handleMessage(cMessage *msg)
 
 void Source::forwardMessage(Caso3Pkt *msg)
 {
-    EV << "Forwarding message " << msg << "\n";
+    //EV << "Forwarding message " << msg << "\n";
+    numSent++;
     send(msg, "out");
 }
 
+void Source::refreshDisplay() const
+{
+    char buf[200];
+    sprintf(buf, "sent: %ld", numSent);
+    getDisplayString().setTagArg("t", 0, buf);
+}

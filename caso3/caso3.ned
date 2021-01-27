@@ -34,9 +34,9 @@ network Caso3
 {
     types:
         channel Channel extends ned.DatarateChannel {
-            delay = 10ms; // tiempo de propagación
+            delay = 5ms; // tiempo de propagación
             datarate = 9600bps;
-            per = 0.1;
+            //per = 1e-3;
         }
     submodules:
         node[5]: SimpleNode;
