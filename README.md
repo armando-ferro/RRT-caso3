@@ -16,7 +16,7 @@ En las siguientes imágenes se muestra el esquema general de la red, de forma te
 
 <p align="center">
   <img src="images/esquema-teoria.png" alt="Esquema de red general teórico" width="600">
-  <img src="images/esquema-red.png" alt="Esquema de red general simulado" width="600">
+  <img src="images/sim-action.gif" alt="Esquema de red general simulado" width="800">
 </p>
 
 Como se puede observar, se tienen 3 tipos de elementos:
@@ -49,7 +49,11 @@ En el siguiente diagrama de flujos se muestra el procedimiento seguido por los e
   <img src="images/diagrama-flujos-nodos.png" alt="Diagrama de flujo de los source y los simple nodes" width="600">
 </p>
 
-En el siguiente diagrama de flujos se muestra el procedimiento seguido por las colas "FIFO queue":
+Las colas "FIFO queue" tienen 3 estados: idle (en espera), sending (enviando un paquete) y waitingACK (esperando un ACK). En las siguientes imágenes se muestran un diagrama de estados y otro de flujos:
+
+<p align="center">
+  <img src="images/fifo-states.png" alt="Diagrama de flujo de las colas" width="400">
+</p>
 
 <p align="center">
   <img src="images/diagrama-flujos-cola.png" alt="Diagrama de flujo de las colas" width="1000">
@@ -59,7 +63,7 @@ En el siguiente diagrama de flujos se muestra el procedimiento seguido por las c
 
 Una de las estadísticas que se ha recogido es el delay de los paquetes desde que son generados hasta que llegan a uno de los dos nodos finales (el 3 y el 4). Para calcular el delay de cada paquete, al generarlo se ha guardado en él un campo "initTime", con el tiempo de creación, y a la llegada a uno de los nodos finales se ha registrado el delay como la diferencia entre el tiempo de simulación de llegada y el tiempo de creación. 
 
-Se ha utilizado un objeto Histograma de OMNeT++, que calcula la media de dicho rertardo. En las siguientes imágenes se muestra cómo, después de 100 000 segundos de simulación, el retardo medio converge a 0,765 segundos para el nodo 3 y 7,29 segundos para el nodo 4.
+Se ha utilizado un objeto Histograma de OMNeT++, que calcula la media de dicho rertardo. En las siguientes imágenes se muestra cómo, después de 100 000 segundos de simulación, el retardo medio converge a **0,765 segundos** para el nodo 3 y **7,29 segundos** para el nodo 4.
 
 <p align="center">
   <img src="images/node3-stats.png" alt="Estadísticas del nodo 3">
