@@ -27,7 +27,7 @@
  *     int flowId;
  *     int flowSeqNum;
  *     int linkSeqNum;
- * 
+ *     int hopCount = 0;
  * 
  * }
  * </pre>
@@ -39,6 +39,7 @@ class Caso3Pkt : public ::omnetpp::cPacket
     int flowId;
     int flowSeqNum;
     int linkSeqNum;
+    int hopCount;
 
   private:
     void copy(const Caso3Pkt& other);
@@ -65,6 +66,8 @@ class Caso3Pkt : public ::omnetpp::cPacket
     virtual void setFlowSeqNum(int flowSeqNum);
     virtual int getLinkSeqNum() const;
     virtual void setLinkSeqNum(int linkSeqNum);
+    virtual int getHopCount() const;
+    virtual void setHopCount(int hopCount);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const Caso3Pkt& obj) {obj.parsimPack(b);}

@@ -14,7 +14,7 @@ packet Caso3Pkt
     int flowId;
     int flowSeqNum;
     int linkSeqNum;
-    
+    int hopCount = 0;
 
 }
 

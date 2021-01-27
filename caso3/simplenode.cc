@@ -24,6 +24,8 @@ class SimpleNode : public cSimpleModule
     long numDiscarded;
     cLongHistogram delayStats;
     cOutVector delayVector;
+    cLongHistogram hopCountStats;
+    cOutVector hopCountVector;
   protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
@@ -50,6 +52,7 @@ void SimpleNode::handleMessage(cMessage *msg)
     Caso3Pkt *tmsg = check_and_cast<Caso3Pkt *>(msg);
 
     numReceived++;
+    tmsg->setHopCount(tmsg->getHopCount()+1);
 
     if(tmsg->getArrivalGateId() != gate("gateSource")->getId()) {
         int gateLinkIndex = tmsg->getArrivalGate()->getIndex();
@@ -65,9 +68,11 @@ void SimpleNode::handleMessage(cMessage *msg)
                 forwardMessage(tmsg);
             } else {
                 simtime_t delay = simTime() - tmsg->getInitTime();
-                EV << "Delay " << getIndex() << ": " << delay << "\n";
+                //EV << "Delay " << getIndex() << ": " << delay << "\n";
                 delayStats.collect(delay);
                 delayVector.record(delay);
+                hopCountStats.collect(tmsg->getHopCount());
+                hopCountVector.record(tmsg->getHopCount());
                 bubble("ARRIVED. ACK SENT. DELETING!");
                 delete tmsg;
             }
@@ -115,10 +120,6 @@ void SimpleNode::refreshDisplay() const
 
 void SimpleNode::finish()
     {
-        EV << "Delay, min:    " << delayStats.getMin() << endl;
-        EV << "Delay, max:    " << delayStats.getMax() << endl;
-        EV << "Delay, mean:   " << delayStats.getMean() << endl;
-        EV << "Delay, stddev: " << delayStats.getStddev() << endl;
-
         delayStats.recordAs("delay");
+        hopCountStats.recordAs("hop count");
     }

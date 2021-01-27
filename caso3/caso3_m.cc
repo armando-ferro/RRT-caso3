@@ -185,6 +185,7 @@ Caso3Pkt::Caso3Pkt(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
     this->flowId = 0;
     this->flowSeqNum = 0;
     this->linkSeqNum = 0;
+    this->hopCount = 0;
 }
 
 Caso3Pkt::Caso3Pkt(const Caso3Pkt& other) : ::omnetpp::cPacket(other)
@@ -210,6 +211,7 @@ void Caso3Pkt::copy(const Caso3Pkt& other)
     this->flowId = other.flowId;
     this->flowSeqNum = other.flowSeqNum;
     this->linkSeqNum = other.linkSeqNum;
+    this->hopCount = other.hopCount;
 }
 
 void Caso3Pkt::parsimPack(omnetpp::cCommBuffer *b) const
@@ -219,6 +221,7 @@ void Caso3Pkt::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->flowId);
     doParsimPacking(b,this->flowSeqNum);
     doParsimPacking(b,this->linkSeqNum);
+    doParsimPacking(b,this->hopCount);
 }
 
 void Caso3Pkt::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -228,6 +231,7 @@ void Caso3Pkt::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->flowId);
     doParsimUnpacking(b,this->flowSeqNum);
     doParsimUnpacking(b,this->linkSeqNum);
+    doParsimUnpacking(b,this->hopCount);
 }
 
 ::omnetpp::simtime_t Caso3Pkt::getInitTime() const
@@ -268,6 +272,16 @@ int Caso3Pkt::getLinkSeqNum() const
 void Caso3Pkt::setLinkSeqNum(int linkSeqNum)
 {
     this->linkSeqNum = linkSeqNum;
+}
+
+int Caso3Pkt::getHopCount() const
+{
+    return this->hopCount;
+}
+
+void Caso3Pkt::setHopCount(int hopCount)
+{
+    this->hopCount = hopCount;
 }
 
 class Caso3PktDescriptor : public omnetpp::cClassDescriptor
@@ -335,7 +349,7 @@ const char *Caso3PktDescriptor::getProperty(const char *propertyname) const
 int Caso3PktDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 4+basedesc->getFieldCount() : 4;
+    return basedesc ? 5+basedesc->getFieldCount() : 5;
 }
 
 unsigned int Caso3PktDescriptor::getFieldTypeFlags(int field) const
@@ -351,8 +365,9 @@ unsigned int Caso3PktDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
 }
 
 const char *Caso3PktDescriptor::getFieldName(int field) const
@@ -368,8 +383,9 @@ const char *Caso3PktDescriptor::getFieldName(int field) const
         "flowId",
         "flowSeqNum",
         "linkSeqNum",
+        "hopCount",
     };
-    return (field>=0 && field<4) ? fieldNames[field] : nullptr;
+    return (field>=0 && field<5) ? fieldNames[field] : nullptr;
 }
 
 int Caso3PktDescriptor::findField(const char *fieldName) const
@@ -380,6 +396,7 @@ int Caso3PktDescriptor::findField(const char *fieldName) const
     if (fieldName[0]=='f' && strcmp(fieldName, "flowId")==0) return base+1;
     if (fieldName[0]=='f' && strcmp(fieldName, "flowSeqNum")==0) return base+2;
     if (fieldName[0]=='l' && strcmp(fieldName, "linkSeqNum")==0) return base+3;
+    if (fieldName[0]=='h' && strcmp(fieldName, "hopCount")==0) return base+4;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -396,8 +413,9 @@ const char *Caso3PktDescriptor::getFieldTypeString(int field) const
         "int",
         "int",
         "int",
+        "int",
     };
-    return (field>=0 && field<4) ? fieldTypeStrings[field] : nullptr;
+    return (field>=0 && field<5) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **Caso3PktDescriptor::getFieldPropertyNames(int field) const
@@ -468,6 +486,7 @@ std::string Caso3PktDescriptor::getFieldValueAsString(void *object, int field, i
         case 1: return long2string(pp->getFlowId());
         case 2: return long2string(pp->getFlowSeqNum());
         case 3: return long2string(pp->getLinkSeqNum());
+        case 4: return long2string(pp->getHopCount());
         default: return "";
     }
 }
@@ -486,6 +505,7 @@ bool Caso3PktDescriptor::setFieldValueAsString(void *object, int field, int i, c
         case 1: pp->setFlowId(string2long(value)); return true;
         case 2: pp->setFlowSeqNum(string2long(value)); return true;
         case 3: pp->setLinkSeqNum(string2long(value)); return true;
+        case 4: pp->setHopCount(string2long(value)); return true;
         default: return false;
     }
 }
