@@ -26,6 +26,21 @@ Como se puede observar, se tienen 3 tipos de elementos:
 
 Además, se ha utilizado la clase DatarateChannel para simular los enlaces.
 
+## Formato de paquete
+
+Se ha definido un nuevo paquete con los siguientes campos:
+
+| Campo          | Tipo       | Descripción                    |
+|----------------|------------|--------------------------------|
+| initTime       | simtime_t  | Tiempo de creación del paquete |
+| flowId         | int        | ID del flujo al que pertenece  |
+| flowSeqNum     | int        | Número de secuencia del flujo  |
+| linkSeqNum     | int        | Número de secuencia del enlace |
+| hopCount       | int        | Número de saltos               |
+
+
+## Datos de la simulación
+
 Los datos utilizados para la simulación son los mostrados en la siguiente tabla:
 
 | Campo                          | Valor                     |
@@ -37,6 +52,7 @@ Los datos utilizados para la simulación son los mostrados en la siguiente tabla
 | Timeout                        | 500 ms                    |
 | Tiempo de propagación          | 5 ms                      |
 | PER (Packet Error Rate)        | 1e-5                      |
+  
 
 La longitud de los paquetes sigue una distribución exponencial, con la media mostrada en la tabla. El tiempo de generación entre un paquete y otro tiene también una distribución exponencial, con media 1/&#955;.
 
